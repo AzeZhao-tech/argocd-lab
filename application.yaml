@@ -1,0 +1,34 @@
+# application.yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: myapp-argo-application
+  namespace: argocd
+spec:
+  project: default
+
+  source:
+    repoURL: https://gitee.com/onebig32/argocd-lab.git
+    targetRevision: test
+    path: .
+    helm:
+      valueFiles:
+      - value.yaml
+
+  ignoreDifferences:
+  - group: argoproj.io
+    kind: Application
+    name: myapp-argo-application
+    jsonPointers:
+    - /spec
+  destination: 
+    server: https://kubernetes.default.svc
+    namespace: myapp
+
+  syncPolicy:
+    syncOptions:
+    - CreateNamespace=true
+
+    automated:
+      selfHeal: true
+      prune: true
